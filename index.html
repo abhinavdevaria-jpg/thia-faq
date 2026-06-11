@@ -236,8 +236,12 @@
     word-break: break-all;
   }
   .faq-a-inner a:hover { color: var(--accent); }
+  .faq-a-inner p, #intro-block p {
+    margin: 0 0 8px 0;
+    padding: 0;
+  }
   .faq-a-inner ul {
-    margin: 8px 0 8px 20px;
+    margin: 4px 0 8px 20px;
     padding: 0;
   }
   .faq-a-inner li { margin-bottom: 4px; }
@@ -448,30 +452,47 @@ async function loadFAQ() {
 
 function formatText(text) {
   if (!text) return '';
+
   // Escape HTML first
   let out = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+
   // Convert URLs to clickable links
   out = out.replace(
     /(https?:\/\/[^\s<>"')\]]+)/gi,
     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
   );
-  // Convert markdown bold **text**
+
+  // Convert markdown bold **text** and italic *text*
   out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Convert markdown italic *text*
   out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // Convert markdown bullet lines - item
-  out = out.replace(/(^|\n)- (.+)/g, '$1<li>$2</li>');
-  out = out.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-  // Convert newlines to <br>
-  out = out.replace(/\r\n|\r|\n/g, '<br>');
-  // Clean up <br> inside lists
-  out = out.replace(/<br>(<ul>|<\/ul>|<li>)/g, '$1');
-  // Preserve multiple spaces
-  out = out.replace(/  +/g, m => '&nbsp;'.repeat(m.length));
-  return out;
+
+  // Split into lines and process each
+  const lines = out.split(/\r\n|\r|\n/);
+  let html = '';
+  let inList = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const isBullet = /^- (.+)/.test(line);
+
+    if (isBullet) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += '<li>' + line.replace(/^- /, '') + '</li>';
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (line.trim() === '') {
+        html += '<br>';
+      } else {
+        html += '<p>' + line + '</p>';
+      }
+    }
+  }
+  if (inList) html += '</ul>';
+
+  return html;
 }
 
 function highlight(text, q) {
