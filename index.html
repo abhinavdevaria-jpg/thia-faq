@@ -464,29 +464,35 @@ async function loadFAQ() {
 function formatText(text) {
   if (!text) return '';
 
-  // Convert URLs FIRST (before HTML escaping)
+  // Step 1: Convert markdown links [text](url) BEFORE any escaping
   let out = text.replace(
-    /(https?:\/\/[^\s<>"')\]]+)/gi,
-    '\x00LINK\x00$1\x00ENDLINK\x00'
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/gi,
+    '\x00LINK\x00$2\x00LINKTEXT\x00$1\x00ENDLINK\x00'
   );
 
-  // Now escape HTML
+  // Step 2: Convert bare URLs (not already wrapped)
+  out = out.replace(
+    /(https?:\/\/[^\s\x00"')\]]+)/gi,
+    '\x00LINK\x00$1\x00LINKTEXT\x00$1\x00ENDLINK\x00'
+  );
+
+  // Step 3: Escape HTML special chars (won't touch \x00 placeholders)
   out = out
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Restore links as proper anchor tags
+  // Step 4: Restore links as anchor tags
   out = out.replace(
-    /\x00LINK\x00(.+?)\x00ENDLINK\x00/g,
-    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+    /\x00LINK\x00(.+?)\x00LINKTEXT\x00(.+?)\x00ENDLINK\x00/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>'
   );
 
-  // Convert markdown bold **text** and italic *text*
+  // Step 5: Markdown bold and italic
   out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-  // Split into lines and process each
+  // Step 6: Process lines (bullets, indented text, paragraphs)
   const lines = out.split(/\r\n|\r|\n/);
   let html = '';
   let inList = false;
@@ -495,13 +501,12 @@ function formatText(text) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const isBullet = /^- (.+)/.test(line);
-    const isIndented = /^(\t|  )(.*)/.test(line); // tab or 2+ spaces
+    const isIndented = /^(\t|  )(.*)/.test(line);
 
     if (isBullet) {
-      if (inSubText) { html += '</div>'; inSubText = false; }
+      if (inSubText) { html += '</div></li>'; inSubText = false; }
       if (!inList) { html += '<ul>'; inList = true; }
       html += '<li>' + line.replace(/^- /, '');
-      // Check if next line is indented — if so, open sub div
       if (i + 1 < lines.length && /^(\t|  )/.test(lines[i + 1])) {
         html += '<div class="bullet-sub">';
         inSubText = true;
@@ -510,12 +515,7 @@ function formatText(text) {
       }
     } else if (isIndented && inList) {
       const content = line.replace(/^(\t|  )/, '');
-      if (content.trim() === '') {
-        // empty indented line — just a spacer
-      } else {
-        html += '<p>' + content + '</p>';
-      }
-      // Check if next line is NOT indented — close sub div
+      if (content.trim()) html += '<p>' + content + '</p>';
       if (i + 1 >= lines.length || !/^(\t|  )/.test(lines[i + 1])) {
         if (inSubText) { html += '</div></li>'; inSubText = false; }
       }
