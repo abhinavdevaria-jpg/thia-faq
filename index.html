@@ -244,7 +244,18 @@
     margin: 4px 0 8px 20px;
     padding: 0;
   }
-  .faq-a-inner li { margin-bottom: 4px; }
+  .faq-a-inner li {
+    margin-bottom: 4px;
+  }
+  .bullet-sub {
+    margin: 6px 0 4px 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.7;
+  }
+  .bullet-sub p { margin: 0 0 4px 0; }
   .faq-a-inner strong { color: var(--text); font-weight: 600; }
   .faq-a-inner em { font-style: italic; }
 
@@ -453,15 +464,21 @@ async function loadFAQ() {
 function formatText(text) {
   if (!text) return '';
 
-  // Escape HTML first
-  let out = text
+  // Convert URLs FIRST (before HTML escaping)
+  let out = text.replace(
+    /(https?:\/\/[^\s<>"')\]]+)/gi,
+    '\x00LINK\x00$1\x00ENDLINK\x00'
+  );
+
+  // Now escape HTML
+  out = out
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Convert URLs to clickable links
+  // Restore links as proper anchor tags
   out = out.replace(
-    /(https?:\/\/[^\s<>"')\]]+)/gi,
+    /\x00LINK\x00(.+?)\x00ENDLINK\x00/g,
     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
   );
 
@@ -473,15 +490,37 @@ function formatText(text) {
   const lines = out.split(/\r\n|\r|\n/);
   let html = '';
   let inList = false;
+  let inSubText = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const isBullet = /^- (.+)/.test(line);
+    const isIndented = /^(\t|  )(.*)/.test(line); // tab or 2+ spaces
 
     if (isBullet) {
+      if (inSubText) { html += '</div>'; inSubText = false; }
       if (!inList) { html += '<ul>'; inList = true; }
-      html += '<li>' + line.replace(/^- /, '') + '</li>';
+      html += '<li>' + line.replace(/^- /, '');
+      // Check if next line is indented — if so, open sub div
+      if (i + 1 < lines.length && /^(\t|  )/.test(lines[i + 1])) {
+        html += '<div class="bullet-sub">';
+        inSubText = true;
+      } else {
+        html += '</li>';
+      }
+    } else if (isIndented && inList) {
+      const content = line.replace(/^(\t|  )/, '');
+      if (content.trim() === '') {
+        // empty indented line — just a spacer
+      } else {
+        html += '<p>' + content + '</p>';
+      }
+      // Check if next line is NOT indented — close sub div
+      if (i + 1 >= lines.length || !/^(\t|  )/.test(lines[i + 1])) {
+        if (inSubText) { html += '</div></li>'; inSubText = false; }
+      }
     } else {
+      if (inSubText) { html += '</div></li>'; inSubText = false; }
       if (inList) { html += '</ul>'; inList = false; }
       if (line.trim() === '') {
         html += '<br>';
@@ -490,6 +529,7 @@ function formatText(text) {
       }
     }
   }
+  if (inSubText) html += '</div></li>';
   if (inList) html += '</ul>';
 
   return html;
