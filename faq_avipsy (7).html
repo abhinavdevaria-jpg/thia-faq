@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — AviPsy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f5f9;
+    --surface: #ffffff;
+    --accent: #1e2347;
+    --accent-light: #eaebf4;
+    --accent-mid: #3a4080;
+    --text: #1e2347;
+    --muted: #6b7280;
+    --border: #e0e2ee;
+    --shadow: 0 2px 16px rgba(30,35,71,0.08);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: radial-gradient(ellipse at 30% 60%, #2a3060 0%, #1a1e3a 40%, #161a33 100%);
+    padding: 44px 40px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .logo {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 2.2rem;
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    position: relative; z-index: 1;
+    line-height: 1;
+  }
+  .logo strong {
+    font-weight: 700;
+  }
+  .header-subtitle {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.9rem;
+    font-weight: 300;
+    margin-top: 10px;
+    position: relative; z-index: 1;
+    letter-spacing: 0.02em;
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    max-width: 600px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    position: relative; z-index: 10;
+  }
+  .search-box {
+    width: 100%;
+    padding: 16px 52px 16px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(30,35,71,0.10);
+    outline: none;
+    color: var(--text);
+    transition: box-shadow 0.2s;
+  }
+  .search-box:focus { box-shadow: 0 4px 28px rgba(30,35,71,0.28); }
+  .search-box::placeholder { color: #b0aaa0; }
+  .search-icon {
+    position: absolute; right: 38px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted); font-size: 1.1rem; pointer-events: none;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 800px;
+    margin: 36px auto 0;
+    padding: 0 20px;
+  }
+
+  /* INTRO BLOCK */
+  #intro-block {
+    max-width: 800px;
+    margin: 32px auto 0;
+    padding: 24px 32px;
+    background: #fff;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--accent);
+    box-shadow: var(--shadow);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #3d4451;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (max-width: 840px) {
+    #intro-block { margin: 24px 20px 0; padding: 20px 20px; }
+  }
+
+  /* CATEGORY TABS */
+  .cat-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .cat-tab {
+    padding: 7px 16px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .cat-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* CATEGORY SECTION */
+  .cat-section { margin-bottom: 40px; }
+  .cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-title .icon { font-size: 1.3rem; }
+
+  /* FAQ ITEMS */
+  .faq-item {
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .faq-item:hover { box-shadow: 0 4px 20px rgba(45,90,142,0.13); }
+
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 18px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.97rem;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: background 0.15s;
+  }
+  .faq-q:hover { background: var(--accent-light); }
+  .faq-item.open .faq-q { background: var(--accent-light); color: var(--accent); }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.25s, background 0.15s;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .faq-item.open .faq-chevron {
+    transform: rotate(180deg);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .faq-item.open .faq-a { max-height: 8000px; }
+  .faq-a-inner {
+    padding: 0 22px 20px;
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #3d4451;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .faq-a-inner a {
+    color: var(--accent-mid);
+    text-decoration: underline;
+    word-break: break-all;
+  }
+  .faq-a-inner a:hover { color: var(--accent); }
+  .faq-a-inner ul {
+    margin: 8px 0 8px 20px;
+    padding: 0;
+  }
+  .faq-a-inner li { margin-bottom: 4px; }
+  .faq-a-inner strong { color: var(--text); font-weight: 600; }
+  .faq-a-inner em { font-style: italic; }
+
+  #intro-block a {
+    color: var(--accent-mid);
+    text-decoration: underline;
+  }
+  #intro-block strong { font-weight: 600; }
+  #intro-block em { font-style: italic; }
+
+  /* EMPTY / LOADING */
+  .state-msg {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .state-msg .emoji { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+  .state-msg p { font-size: 0.95rem; }
+
+  .loader {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    background: #1e2347;
+    border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 0.78rem;
+    color: #c0bbb0;
+  }
+
+  /* HIGHLIGHT */
+  mark {
+    background: rgba(74,127,181,0.18);
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+
+  @media (max-width: 520px) {
+    .logo { font-size: 1.6rem; }
+    .faq-q { font-size: 0.9rem; padding: 15px 16px; }
+    .faq-a-inner { padding: 12px 16px 16px; font-size: 0.88rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Avi<strong>Psy</strong></div>
+  <p class="header-subtitle">Questions fréquentes — Consultations & Prise en charge</p>
+</header>
+
+<div id="intro-block" style="display:none"></div>
+
+<div class="search-wrap">
+  <input class="search-box" type="text" id="search" placeholder="Rechercher une question…" autocomplete="off">
+  <span class="search-icon">🔍</span>
+</div>
+
+<main class="main" id="main">
+  <div class="loader" id="loader">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <span>Chargement des questions…</span>
+  </div>
+</main>
+
+<div class="footer">AviPsy © 2025 — Contenu mis à jour automatiquement depuis Google Sheets</div>
+
+<script>
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQAJNiijjIkxHqa-NXcgLfOBIt6EWy4YDYmBKbNB9mcIKCy8i_cA3kIa7r_MtXHJYJlnfPAv-MeKScx/pub?gid=678147698&single=true&output=csv';
+const CONFIG_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQAJNiijjIkxHqa-NXcgLfOBIt6EWy4YDYmBKbNB9mcIKCy8i_cA3kIa7r_MtXHJYJlnfPAv-MeKScx/pub?gid=1265216107&single=true&output=csv';
+const PROXY = 'https://corsproxy.io/?url=';
+
+let allItems = [];
+let activeCategory = 'all';
+let searchQuery = '';
+
+// --- CSV parser (handles quoted fields with commas/newlines) ---
+function parseCSV(text) {
+  const rows = [];
+  let cur = '', inQ = false, row = [];
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i+1];
+    if (c === '"' && inQ && n === '"') { cur += '"'; i++; }
+    else if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+    else if ((c === '\n' || (c === '\r' && n === '\n')) && !inQ) {
+      if (c === '\r') i++;
+      row.push(cur); cur = '';
+      if (row.some(x => x.trim())) rows.push(row);
+      row = [];
+    } else { cur += c; }
+  }
+  if (cur || row.length) { row.push(cur); if (row.some(x=>x.trim())) rows.push(row); }
+  return rows;
+}
+
+async function loadIntro() {
+  try {
+    // Try Config sheet first, fall back to proxy
+    const urls = [
+      CONFIG_CSV,
+      PROXY + encodeURIComponent(CONFIG_CSV)
+    ];
+    let text = null;
+    for (const url of urls) {
+      try {
+        const resp = await fetch(url);
+        if (resp.ok) { text = await resp.text(); break; }
+      } catch(e) { continue; }
+    }
+    if (!text) return;
+    const rows = parseCSV(text);
+    const introRow = rows.find(r => r[0] && r[0].trim().toLowerCase() === 'intro');
+    if (introRow && introRow[1] && introRow[1].trim()) {
+      const div = document.getElementById('intro-block');
+      if (div) { div.innerHTML = formatText(introRow[1].trim()); div.style.display = 'block'; }
+    }
+  } catch(e) { /* Intro is optional — never block FAQ loading */ }
+}
+
+async function loadFAQ() {
+  try {
+    // Try direct first; if CORS-blocked, retry via proxy
+    let resp = await fetch(SHEET_CSV).catch(() => null);
+    if (!resp || !resp.ok) {
+      resp = await fetch(PROXY + encodeURIComponent(SHEET_CSV));
+    }
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) throw new Error('Feuille vide');
+
+    // Detect columns from header row
+    const headers = rows[0].map(h => h.trim().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+    const col = name => headers.findIndex(h => h.includes(name));
+
+    const iCat     = col('cat');      // Catégorie
+    const iIcon    = col('icon');     // Icône
+    const iOrdCat  = col('ord') !== -1 ? col('ord') : col('ordre cat');
+    const iQ       = col('question');
+    const iA       = col('r') !== -1 ? (() => { // Réponse
+      const idx = headers.findIndex(h => h.startsWith('r') && !h.startsWith('re') && h !== 'rang');
+      return idx !== -1 ? idx : col('rep');
+    })() : col('rep');
+    const iOrd     = headers.findIndex(h => h === 'ordre' || h === 'ord');
+    const iPublish = col('publi');
+
+    // Fallback if columns not found — try positional
+    const getCol = (idx, fallback) => idx !== -1 ? idx : fallback;
+    const C = {
+      cat:    getCol(iCat, 0),
+      icon:   getCol(iIcon, 1),
+      ordCat: getCol(iOrdCat, 2),
+      q:      getCol(iQ, 3),
+      a:      getCol(iA !== -1 ? iA : -1, 4),
+      ord:    getCol(iOrd, 5),
+      pub:    getCol(iPublish, 6),
+    };
+
+    allItems = rows.slice(1)
+      .filter(r => r.length > C.q)
+      .map(r => ({
+        cat:    (r[C.cat]    || '').trim(),
+        icon:   (r[C.icon]   || '❓').trim(),
+        ordCat: parseInt(r[C.ordCat]) || 99,
+        q:      (r[C.q]      || '').trim(),
+        a:      (r[C.a]      || '').trim(),
+        ord:    parseInt(r[C.ord]) || 99,
+        pub:    !r[C.pub] || r[C.pub].trim().toLowerCase() !== 'false',
+      }))
+      .filter(it => it.pub && it.q && it.a);
+
+    render();
+  } catch(e) {
+    document.getElementById('loader').outerHTML = `
+      <div class="state-msg">
+        <span class="emoji">❌</span>
+        <p><strong>Erreur de chargement :</strong> ${e.message}</p>
+        <p style="margin-top:8px;font-size:0.85rem;color:#999">
+          Vérifiez que le Google Sheet est bien publié sur le web<br>
+          (Fichier → Partager → Publier sur le web → Feuille 1 → CSV → Publier)
+        </p>
+      </div>`;
+  }
+}
+
+function formatText(text) {
+  if (!text) return '';
+  // Escape HTML first
+  let out = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Convert URLs to clickable links
+  out = out.replace(
+    /(https?:\/\/[^\s<>"')\]]+)/gi,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+  // Convert markdown bold **text**
+  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Convert markdown italic *text*
+  out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Convert markdown bullet lines - item
+  out = out.replace(/(^|\n)- (.+)/g, '$1<li>$2</li>');
+  out = out.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+  // Convert newlines to <br>
+  out = out.replace(/\r\n|\r|\n/g, '<br>');
+  // Clean up <br> inside lists
+  out = out.replace(/<br>(<ul>|<\/ul>|<li>)/g, '$1');
+  // Preserve multiple spaces
+  out = out.replace(/  +/g, m => '&nbsp;'.repeat(m.length));
+  return out;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+}
+
+function render() {
+  const main = document.getElementById('main');
+  const q = searchQuery.toLowerCase().trim();
+
+  let items = allItems;
+  if (q) {
+    items = items.filter(it =>
+      it.q.toLowerCase().includes(q) ||
+      it.a.toLowerCase().includes(q) ||
+      it.cat.toLowerCase().includes(q)
+    );
+  }
+  if (activeCategory !== 'all') {
+    items = items.filter(it => it.cat === activeCategory);
+  }
+
+  // Build categories list (from full data for tabs, from filtered for display)
+  const allCats = [...new Map(
+    allItems
+      .sort((a,b) => a.ordCat - b.ordCat)
+      .map(it => [it.cat, {cat: it.cat, icon: it.icon, ord: it.ordCat}])
+  ).values()];
+
+  // Tabs HTML
+  const tabs = `
+    <div class="cat-tabs" id="tabs">
+      <button class="cat-tab ${activeCategory==='all'?'active':''}" data-cat="all">Toutes</button>
+      ${allCats.map(c=>`
+        <button class="cat-tab ${activeCategory===c.cat?'active':''}" data-cat="${c.cat}">
+          ${c.icon} ${c.cat}
+        </button>
+      `).join('')}
+    </div>`;
+
+  if (!items.length) {
+    main.innerHTML = tabs + `
+      <div class="state-msg">
+        <span class="emoji">🔍</span>
+        <p>Aucune question ne correspond à votre recherche.</p>
+      </div>`;
+    attachTabs();
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  items.sort((a,b) => a.ordCat - b.ordCat || a.ord - b.ord).forEach(it => {
+    if (!grouped[it.cat]) grouped[it.cat] = {icon: it.icon, items: []};
+    grouped[it.cat].items.push(it);
+  });
+
+  const sectionsHTML = Object.entries(grouped).map(([cat, {icon, items}]) => `
+    <section class="cat-section">
+      <h2 class="cat-title"><span class="icon">${icon}</span>${cat}</h2>
+      ${items.map((it, i) => `
+        <div class="faq-item" data-idx="${cat}-${i}">
+          <button class="faq-q" onclick="toggle('${cat}-${i}')">
+            <span>${highlight(it.q, searchQuery)}</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">${highlight(formatText(it.a), searchQuery)}</div>
+          </div>
+        </div>
+      `).join('')}
+    </section>
+  `).join('');
+
+  main.innerHTML = tabs + sectionsHTML;
+  attachTabs();
+}
+
+function toggle(idx) {
+  const el = document.querySelector(`[data-idx="${idx}"]`);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(e => e.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+function attachTabs() {
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      render();
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  activeCategory = 'all';
+  render();
+});
+
+loadIntro();
+loadFAQ();
+</script>
+</body>
+</html>
